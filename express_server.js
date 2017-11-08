@@ -9,12 +9,11 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 //database object holding key value pairs matching random generated keys to longform URLS
-const urlDatabase = {
+var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 
-
-};
+}
 //random string generator creates a new random 6 character string and
 //sets it to variable rString
 var rString = generateRandomString('0123456789abcdefghijklmnopqrstuvwxyz');
@@ -27,7 +26,15 @@ function generateRandomString(chars){
     return result;
 }
 
-// gets urls_new.ejs file and displays it for user
+app.post("/urls/:id/delete", (req, res) => {
+
+delete urlDatabase[req.params.id]
+  res.redirect("/urls");
+
+});
+
+
+// on a get request at /urls/new - render urls_new.ejs file and displays it for user
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -39,6 +46,9 @@ app.post("/urls", (req, res) => {
   urlDatabase[rString] = req.body.longURL;
   res.redirect(`/urls/${rString}`);
 });
+
+
+
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
