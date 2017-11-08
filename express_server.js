@@ -26,6 +26,13 @@ function generateRandomString(chars){
     return result;
 }
 
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+res.redirect(`/urls/${req.params.id}`);
+});
+
+
+
 app.post("/urls/:id/delete", (req, res) => {
 
 delete urlDatabase[req.params.id]
@@ -55,6 +62,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { urls: urlDatabase, shortURL: req.params.id };
   res.render("urls_show", templateVars);
 });
+
 
 //pulls up the urls_index page when the user enters the /url domain
 app.get("/urls", (req, res) => {
