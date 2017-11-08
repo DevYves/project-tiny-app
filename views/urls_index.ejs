@@ -15,9 +15,14 @@
   <h1> URLS </h1>
 
   <% for(var url in urls) { %>
-        <li><%= url + ': ' + urls[url] %></li>
-        <form action ="/urls/<%= url %>/delete" method = "POST">
-        <input type ="Submit" value="DELETE">
+
+        <li>
+          <%= url + ': ' + urls[url] %>
+          <a href="urls/<%= url %>">Edit</a>
+          <form action ="/urls/<%= url %>/delete" method = "POST">
+            <input type ="Submit" value="DELETE">
+          </form>
+        </li>
       <% } %>
 
 </body>
