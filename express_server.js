@@ -1,8 +1,13 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
+var cookieParser = require('cookie-parser')
 //require ejs
 app.set('view engine', 'ejs');
+//Cookie Parser
+var app = express()
+app.use(cookieParser())
+
 
 
 const bodyParser = require("body-parser");
