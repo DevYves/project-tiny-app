@@ -21,6 +21,8 @@ var urlDatabase = {
 //sets it to variable rString
 var rString = generateRandomString('0123456789abcdefghijklmnopqrstuvwxyz');
 
+
+
 function generateRandomString(chars){
     var result = '';
     for (var i = 6; i > 0; --i) {
@@ -30,12 +32,12 @@ function generateRandomString(chars){
 }
 
 
+
+
 app.post("/login", (req, res) =>{
   let username = req.body.username;
   console.log(username)
   username = res.cookie("username", username) ;
-
-
   res.redirect(`/urls/`);
 });
 
@@ -59,7 +61,8 @@ delete urlDatabase[req.params.id]
 
 // on a get request at /urls/new - render urls_new.ejs file and displays it for user
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { urls: urlDatabase, shortURL: req.params.id, username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
 });
 
 // takes the user input and puts it in our urlDatabase object
@@ -75,14 +78,14 @@ app.post("/urls", (req, res) => {
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { urls: urlDatabase, shortURL: req.params.id };
+  let templateVars = { urls: urlDatabase, shortURL: req.params.id, username: req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
 
 
 //pulls up the urls_index page when the user enters the /url domain
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase , username: req.cookies["username"]};
   res.render("urls_index", templateVars);
 });
 
