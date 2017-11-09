@@ -31,7 +31,12 @@ function generateRandomString(chars){
     return result;
 }
 
-
+app.post("/logout", (req, res)=>{
+  res.cookie("username", "", { expires: new Date(0)});
+  // res.clearCookie("username" , { path: '/logout'});
+  console.log("im here")
+  res.redirect('/urls');
+});
 
 
 app.post("/login", (req, res) =>{
@@ -85,6 +90,7 @@ app.get("/urls/:id", (req, res) => {
 
 //pulls up the urls_index page when the user enters the /url domain
 app.get("/urls", (req, res) => {
+  console.log(req.cookies, req.cookies.username);
   let templateVars = { urls: urlDatabase , username: req.cookies["username"]};
   res.render("urls_index", templateVars);
 });
