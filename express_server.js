@@ -8,8 +8,6 @@ app.set('view engine', 'ejs');
 
 app.use(cookieParser());
 
-
-
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -30,6 +28,19 @@ function generateRandomString(chars){
     }
     return result;
 }
+
+
+app.post("/login", (req, res) =>{
+  let userName = req.body.userName;
+  console.log("userName before settign cookie" + userName);
+  userName = res.cookie(userName) ;
+  console.log(userName);
+
+  res.redirect(`/urls/`);
+});
+
+
+// res.cookie(req.body)
 
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
