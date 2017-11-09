@@ -5,6 +5,15 @@
   <title>TinyApp</title>
 </head>
 <body>
+
+  <header>
+    <% include ./partials/_header %>
+    <nav>
+   <a href="/urls/"> Tiny URLS List</a>
+   <a href="/urls/new"> Make a new tiny URL</a>
+ </nav>
+  </header>
+
    <% include ./partials/_header %>
   <h1> URL </h1>
   <%= shortURL %>
