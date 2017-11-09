@@ -1,0 +1,34 @@
+{
+  "name": "tiny-app",
+  "version": "1.0.0",
+  "description": "This is a project for Lighthouse labs",
+  "main": "express_server.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "nodemon": "^1.12.1"
+  },
+  "devDependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevYves/project-tiny-app.git"
+  },
+  "scripts": {
+    "start":"nodemon express_server.js"
+  },
+
+
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevYves/project-tiny-app/issues"
+  },
+  "homepage": "https://github.com/DevYves/project-tiny-app#readme"
+}

@@ -1,1 +1,3 @@
-This is a project for Lighthouse labs
+##Tiny App
+
+This is a web application using node and express to shorten URLS.
