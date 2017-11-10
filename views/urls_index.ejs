@@ -1,5 +1,4 @@
 
-
 //test//
 <!DOCTYPE html>
 <html lang="en">
@@ -15,10 +14,9 @@
   <h1> URLS </h1>
 
   <% for(var url in urls) { %>
-
         <li>
           <%= url + ': ' + urls[url] %>
-          <a href="urls/<%= url %>">Edit</a>
+          <a href="/urls/<%= url %>">Edit</a>
           <form action ="/urls/<%= url %>/delete" method = "POST">
             <input type ="Submit" value="DELETE">
           </form>

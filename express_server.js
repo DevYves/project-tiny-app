@@ -1,5 +1,3 @@
-
-// DEPENDENCIES //
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -120,8 +118,8 @@ app.post("/register", (req, res) => {
 
 //LOGOUT POST SECTION - recieves query for logout and deletes cookie
 app.post("/logout", (req, res)=>{
-  req.cookies.user_id = null;
-  // res.cookie("user_id", "", { expires: new Date(0)});
+  // req.cookies.user_id = null;
+  res.cookie("user_id", "", { expires: new Date(0)});
   res.redirect(`/urls`);
 });
 
@@ -160,11 +158,20 @@ app.post("/urls/:id", (req, res) => {
 
 });
 //deletes item from database on button click
-app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
-});
 
+
+// Deletes a URL from database if it is the users link
+app.post("/urls/:id/delete", (req, res) => {
+  console.log("url database: ", urlDatabase[req.params.id].userID);
+  console.log("req.cookies: ", req.cookies.user_id);
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    res.status(403);
+    res.send("Naughty Gnomes at it again! NO deleting other people's links please");
+  } else {
+    delete urlDatabase[req.params.id];
+    res.redirect("/urls"); // Sends user back to the URLs page after deletion.
+  }
+});
 // takes the user input and puts it in our urlDatabase object
 //matched up with a random generated key
 app.post("/urls", (req, res) => {
@@ -186,8 +193,14 @@ app.get("/urls/new", (req, res) => {
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
+  console.log(urlDatabase[req.params.id].userID )
+   if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    res.redirect("/urls");
+  } else {
   let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
   res.render("urls_show", templateVars);
+}
+
 });
 
 //pulls up the urls_index page when the user enters the /url domain
