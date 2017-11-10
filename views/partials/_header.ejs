@@ -1,21 +1,15 @@
 
-
-<% if (username === undefined){ %>
-     <form action="/login" method="POST">
-      <label for="username"> Name </label>
-      <input id="user" type="text" name="username" placeholder="Username" style="width: 300px">
-      <input type="submit" value="submit">
-      </form>
-  <% } else { %>
-    <div>
-  You are logged in as <%= username %>
-</div>
-    <form action="/logout" method="POST">
-     <label for="username"> Logout </label>
-      <input type="submit" value="submit">
-      </form>
-
-      <% } %>
+<nav>
+   <h1> Tiny App </h1>
+      <a href="/urls/"> Tiny URLS List</a>
+      <a href="/urls/new"> Make a new tiny URL</a>
+      <a href="/login">Login</a>
+      <a href="/register"> Register </a>
+</nav>
 
 
+</h3>
+  <form action="/logout" method="POST">
+    <input type="submit" value="Logout">
+  </form>
 
