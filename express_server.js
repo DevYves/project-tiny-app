@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 //require ejs
 app.set('view engine', 'ejs');
 //Cookie Parser
@@ -22,7 +22,7 @@ var urlDatabase = {
 var rString = generateRandomString('0123456789abcdefghijklmnopqrstuvwxyz');
 
 
-
+//function used to generate our shortened URL
 function generateRandomString(chars){
     var result = '';
     for (var i = 6; i > 0; --i) {
@@ -30,11 +30,9 @@ function generateRandomString(chars){
     }
     return result;
 }
-
+//POST request
 app.post("/logout", (req, res)=>{
   res.cookie("username", "", { expires: new Date(0)});
-  // res.clearCookie("username" , { path: '/logout'});
-  console.log("im here")
   res.redirect('/urls');
 });
 
@@ -48,7 +46,7 @@ app.post("/login", (req, res) =>{
 
 
 // res.cookie(req.body)
-
+// broke this link - it no longer redirects you to long url. NEed to fix this post request
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
 res.redirect(`/urls/${req.params.id}`);
@@ -63,13 +61,6 @@ delete urlDatabase[req.params.id]
 
 });
 
-
-// on a get request at /urls/new - render urls_new.ejs file and displays it for user
-app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, shortURL: req.params.id, username: req.cookies["username"]};
-  res.render("urls_new", templateVars);
-});
-
 // takes the user input and puts it in our urlDatabase object
 //matched up with a random generated key
 app.post("/urls", (req, res) => {
@@ -77,6 +68,15 @@ app.post("/urls", (req, res) => {
   urlDatabase[rString] = req.body.longURL;
   res.redirect(`/urls/${rString}`);
 });
+
+
+// on a get request at /urls/new - render urls_new.ejs file and displays it for user
+app.get("/urls/new", (req, res) => {
+  let templateVars = { urls: urlDatabase, shortURL: req.params.id, username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
+});
+
+
 
 
 
@@ -113,6 +113,7 @@ app.listen(PORT, () => {
 //send the user to long form url when they have entered their token id after the /
 app.get("/u/:shortURL", (req, res) => {
   let longURL = "http://" + urlDatabase[req.params.shortURL];
+  console.log(longURL);
   res.redirect(longURL);
 });
 
