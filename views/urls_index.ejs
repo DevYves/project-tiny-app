@@ -11,9 +11,9 @@
   </header>
   <h1> URLS </h1>
 
-  <% for(var url in urls) { %>
+  <% for(var list in urlList) { %>
         <li>
-          <%= url + ': ' + urls[url] %>
+          <%= urlList[list] + ': ' + urlList[list].longURL %>
           <a href="/urls/<%= url %>">Edit</a>
           <form action ="/urls/<%= url %>/delete" method = "POST">
             <input type ="Submit" value="DELETE">

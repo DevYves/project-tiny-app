@@ -12,12 +12,12 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
-
 // OBJECT DATABASE SECTION
-//database object holding key value pairs matching random generated keys to longform URLS
+// New Url database
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { userID: "UserRandomID", longURL: "http://www.lighthouselabs.ca"},
+
+  "9sm5xK": { userID: "userRandomID2", longURL: "http://www.google.com" }
 
 }
 // database of users
@@ -37,7 +37,6 @@ const users = {
 // HELPER FUNCTION SECTION
 //variable to hold randomized string
 var rString = generateRandomString('0123456789abcdefghijklmnopqrstuvwxyz');
-
 
 //function used to generate random 6 character string
 function generateRandomString(chars){
@@ -80,8 +79,27 @@ function passwordCheck(email, password){
     }
   }
 }
+// function used to find the links for a given user
+function urlsForUser(id){
+  let userLinks = {};
+  for (let list in urlDatabase) {
+    if (urlDatabase[list].userID === id) {
+      userLinks[list] = urlDatabase[list];
+    }
+  }
+  return userLinks;
+}
 
-
+//function to check that the user is registered in the database
+function CheckUser(userID) {
+  let isAUser = false;
+  for (let user in users) {
+    if (user === userID) {
+      isAUser = true;
+    }
+  }
+  return isAUser;
+}
 
 //REGISTER GET & POST SECTION
 //renders register page on get request for this address
@@ -92,7 +110,7 @@ res.render(`urls_register.ejs`, templateVars);
 });
 // post reciever that registers a new user and initiates checks
 app.post("/register", (req, res) => {
-  let newUsersId = rString;
+  var newUsersId = rString;
   // Check that user inputed an email and password.
   if (!req.body.email | !req.body.password) {
     res.status(400);
@@ -126,7 +144,7 @@ app.post("/logout", (req, res)=>{
 // LOGIN POST AND GET SECTION
 // renders login page
 app.get("/login", (req, res) =>{
-  let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
+  let templateVars = { urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
   res.render("urls_login");
 });
 
@@ -148,17 +166,11 @@ app.post("/login", (req, res) => {
 
 });
 
-// res.cookie(req.body)
-// broke this link - it no longer redirects you to long url. NEed to fix this post request
-
-
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(`/urls/${req.params.id}`);
 
 });
-//deletes item from database on button click
-
 
 // Deletes a URL from database if it is the users link
 app.post("/urls/:id/delete", (req, res) => {
@@ -177,7 +189,7 @@ app.post("/urls/:id/delete", (req, res) => {
 //matched up with a random generated key
 app.post("/urls", (req, res) => {
   console.log(req.body.longURL);
-  urlDatabase[rString] = req.body.longURL;
+  urlDatabase[rString] = { "userID": req.cookies.user_id, "longURL": req.body.longURL }
   res.redirect(`/urls/${rString}`);
 });
 
@@ -187,28 +199,33 @@ app.get("/urls/new", (req, res) => {
   if (req.cookies.user_id === undefined){
     res.redirect("/login");
   } else {
-  let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
+  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
     res.render("urls_new", templateVars);
   }
 });
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
-  console.log(urlDatabase[req.params.id].userID )
+  console.log(urlDatabase[req.params.id].userID);
    if ((urlDatabase[req.params.id].userID !== req.cookies.user_id) || (!req.cookies.user_id)) {
     res.redirect("/urls");
   } else {
-  let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
+  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
   res.render("urls_show", templateVars);
 }
 
 });
 
-//pulls up the urls_index page when the user enters the /url domain
+//main url list page - makes you login or register to view
 app.get("/urls", (req, res) => {
-  console.log(req.cookies, req.cookies.username);
-  let templateVars = { urls: urlDatabase , user_id: req.cookies.user_id};
-  res.render("urls_index", templateVars);
+  console.log(urlsForUser(req.cookies.user_id));
+  if (CheckUser(req.cookies.user_id)) {
+    let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };
+    res.render("urls_index", templateVars);
+  } else {
+    res.status(403);
+    res.send("Sorry Bub. You need to <a href=\"/login\">login  </a> or <a href=\"/register\">register  </a> to view your URLs.");
+  }
 });
 
 //displays 'Hello' on page /
@@ -229,6 +246,5 @@ app.listen(PORT, () => {
 //send the user to long form url when they have entered their token id after the /
 app.get("/u/:shortURL", (req, res) => {
   let longURL = "http://" + urlDatabase[req.params.shortURL];
-  console.log(longURL);
   res.redirect(longURL);
 });
