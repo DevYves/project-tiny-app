@@ -4,6 +4,7 @@
   "description": "This is a project for Lighthouse labs",
   "main": "express_server.js",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.7",
@@ -21,10 +22,8 @@
     "url": "git+https://github.com/DevYves/project-tiny-app.git"
   },
   "scripts": {
-    "start":"nodemon express_server.js"
+    "start": "nodemon express_server.js"
   },
-
-
   "author": "",
   "license": "ISC",
   "bugs": {

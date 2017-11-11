@@ -3,6 +3,9 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
+const password = "purple-monkey-dinosaur";
+const hashedPassword = bcrypt.hashSync(password, 10);
 
 //require ejs and sets up views
 app.set('view engine', 'ejs');
@@ -20,6 +23,10 @@ var urlDatabase = {
   "9sm5xK": { userID: "userRandomID2", longURL: "http://www.google.com" }
 
 }
+var saltRounds = 10;
+//sets the number of rounds of hashing
+var salt = bcrypt.genSaltSync(saltRounds);
+
 // database of users
 const users = {
   "userRandomID": {
@@ -31,8 +38,15 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
+  },
+  "Yves":{
+    id: "yves",
+    email: "yves@gmail.com",
+    password: "test"
   }
 }
+
+const YvesPassword = bcrypt.hashSync("test", 10)
 
 // HELPER FUNCTION SECTION
 //variable to hold randomized string
@@ -95,7 +109,7 @@ function CheckUser(userID) {
   let isAUser = false;
   for (let user in users) {
     if (user === userID) {
-      isAUser = true;
+      isAUser = users[rString].id;
     }
   }
   return isAUser;
@@ -122,10 +136,11 @@ app.post("/register", (req, res) => {
   } else {
       //adds new registered user to object 'users'
       console.log("users before register: " , users);
+      console.log(req.body.password);
         users[newUsersId] = {
         id:       newUsersId,
         email:    req.body.email,
-        password: req.body.password,
+        password: bcrypt.hashSync(req.body.password, salt),
         };
         console.log("users after register: " , users);
         //adds new user to cookie
@@ -156,7 +171,7 @@ app.post("/login", (req, res) => {
   } else if (!checkRegisteredUserEmail(req.body.email)) {
     res.status(403);
     res.send("Error. That email is not registered.");
-  } else if (passwordCheck(req.body.email, req.body.password) == false) {
+  } else if (!bcrypt.compareSync(req.body.password, users[getUserID(req.body.email)].password)) {
     res.status(403);
     res.send("Uh oh The gnomes behind the scenes have checked our lists and your password does not match!");
   } else {
