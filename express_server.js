@@ -6,6 +6,12 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const password = "purple-monkey-dinosaur";
 const hashedPassword = bcrypt.hashSync(password, 10);
+var cookieSession = require('cookie-session')
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["ham"],
+}))
 
 //require ejs and sets up views
 app.set('view engine', 'ejs');
@@ -39,7 +45,7 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   },
-  "Yves":{
+  "yves": {
     id: "yves",
     email: "yves@gmail.com",
     password: "test"
@@ -61,14 +67,25 @@ function generateRandomString(chars){
     return result;
 }
 
-function getUserID(email) {
-  for (var test in users) {
-    if (users[test].email === email) {
-      return users[test].id;
+function CompareIDtoEmail(email) {
+  console.log("email submitted to function: :", email);
+  for (let entry in users) {
+    if (users[entry].email === email) {
+      return entry;
     }
   }
-
+  return "";
 }
+
+//   for (var test in users) {
+//     ("users email in function: ", users[test].email);
+//     if (users[test].email = email) {
+//       return test;
+//     }
+//   }
+//   console.log("found users id after for loop in function: ", users[test].email);
+
+// }
 // function used to check if an email has already been registered
 function checkRegisteredUserEmail(email) {
   let isEmail = false;
@@ -105,20 +122,27 @@ function urlsForUser(id){
 }
 
 //function to check that the user is registered in the database
-function CheckUser(userID) {
+function checkUser(userID) {
+  console.log("userID supplied to function :", userID);
   let isAUser = false;
-  for (let user in users) {
-    if (user === userID) {
-      isAUser = users[rString].id;
+  for (let usertest in users) {
+    console.log(users[usertest].id);
+    if (users[usertest].id === userID) {
+     isAUser = true;
+     return isAUser;
+     Console.log(IsAUser);
     }
   }
-  return isAUser;
+}
+
+function PasswordCheck(userID, password){
+  return bcrypt.compareSync(inputPassword, users[userID].password);
 }
 
 //REGISTER GET & POST SECTION
 //renders register page on get request for this address
 app.get("/register", (req, res) => {
-    let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
+    let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.session.user_id]};
 res.render(`urls_register.ejs`, templateVars);
 
 });
@@ -144,38 +168,48 @@ app.post("/register", (req, res) => {
         };
         console.log("users after register: " , users);
         //adds new user to cookie
-        res.cookie("user_id", rString);
+        req.session.user_id = newUsersId;
         res.redirect("/urls");
         }
 });
 
 //LOGOUT POST SECTION - recieves query for logout and deletes cookie
 app.post("/logout", (req, res)=>{
-  // req.cookies.user_id = null;
-  res.cookie("user_id", "", { expires: new Date(0)});
+  // req.session.user_id = null;
+  // req.session("user_id", "", { expires: new Date(0)});
+  req.session = null;
   res.redirect(`/urls`);
 });
 
 // LOGIN POST AND GET SECTION
 // renders login page
 app.get("/login", (req, res) =>{
-  let templateVars = { urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
-  res.render("urls_login");
+  console.log(req.session.user_id);
+  if (req.session.user_id === undefined){
+    res.render("urls_login");
+  } else {
+    let templateVars = { urlList: urlsForUser(req.session.user_id), userinfo: users[req.session.user_id] };
+    res.redirect("/urls");
+  }
 });
-
+// login checked and working
 app.post("/login", (req, res) => {
-  console.log(req.body.email);
+  var userEmail = req.body.email;
+  var password = req.body.password;
+  let userID ="";
+   userID = CompareIDtoEmail(req.body.email);
+   console.log("req.sessions: ", req.sessions.user_id);
+  console.log("UserID :", userID, "password: ", req.body.password, "user email : ", req.body.email);
   if (!req.body.email | !req.body.password) {
     res.status(400);
     res.send("Error. Must enter a valid email and password.");
-  } else if (!checkRegisteredUserEmail(req.body.email)) {
+  } else if (!checkRegisteredUserEmail(userEmail)) {
     res.status(403);
     res.send("Error. That email is not registered.");
-  } else if (!bcrypt.compareSync(req.body.password, users[getUserID(req.body.email)].password)) {
+  } else if (passwordCheck(userID, password)){
     res.status(403);
     res.send("Uh oh The gnomes behind the scenes have checked our lists and your password does not match!");
   } else {
-    res.cookie("user_id", getUserID(req.body.email));
     res.redirect("/urls");
   }
 
@@ -191,8 +225,8 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
 
   console.log("url database: ", urlDatabase[req.params.id].userID);
-  console.log("req.cookies: ", req.cookies.user_id);
-  if ((urlDatabase[req.params.id].userID !== req.cookies.user_id) || (!req.cookies.user_id)) {
+  console.log("req.session: ", req.session.user_id);
+  if ((urlDatabase[req.params.id].userID !== req.session.user_id) || (!req.session.user_id)) {
     res.status(403);
     res.send("Naughty Gnomes at it again! NO deleting other people's links please");
   } else {
@@ -203,18 +237,21 @@ app.post("/urls/:id/delete", (req, res) => {
 // takes the user input and puts it in our urlDatabase object
 //matched up with a random generated key
 app.post("/urls", (req, res) => {
-  console.log(req.body.longURL);
-  urlDatabase[rString] = { "userID": req.cookies.user_id, "longURL": req.body.longURL }
+  console.log("urlDatabase before: ", urlDatabase);
+  urlDatabase[rString] = { "userID": req.session.user_id,
+                          "longURL": req.body.longURL }
+  console.log("urlDatabase after: ", urlDatabase)
+  console.log("long url: ", urlDatabase[rString].longURL);
   res.redirect(`/urls/${rString}`);
 });
 
 // on a get request at /urls/new - render urls_new.ejs file and displays it for user
 app.get("/urls/new", (req, res) => {
-  console.log(req.cookies.user_id);
-  if (req.cookies.user_id === undefined){
+  console.log(req.session.user_id);
+  if (req.session.user_id === undefined){
     res.redirect("/login");
   } else {
-  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
+  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.session.user_id), userinfo: users[req.session.user_id] };;
     res.render("urls_new", templateVars);
   }
 });
@@ -222,26 +259,32 @@ app.get("/urls/new", (req, res) => {
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
   console.log(urlDatabase[req.params.id].userID);
-   if ((urlDatabase[req.params.id].userID !== req.cookies.user_id) || (!req.cookies.user_id)) {
+   if ((urlDatabase[req.params.id].userID !== req.session.user_id) || (!req.session.user_id)) {
     res.redirect("/urls");
   } else {
-  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };;
+  let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.session.user_id), userinfo: users[req.session.user_id] };;
   res.render("urls_show", templateVars);
 }
 
 });
 
 //main url list page - makes you login or register to view
+
+//make logic sit here not on index page
 app.get("/urls", (req, res) => {
-  console.log(urlsForUser(req.cookies.user_id));
-  if (CheckUser(req.cookies.user_id)) {
-    let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.cookies.user_id), userinfo: users[req.cookies.user_id] };
+  newDatabase = {};
+  if (checkUser(req.session.user_id)){
+    let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.session.user_id), userinfo: users[req.session.user_id] };
     res.render("urls_index", templateVars);
   } else {
     res.status(403);
     res.send("Sorry Bub. You need to <a href=\"/login\">login  </a> or <a href=\"/register\">register  </a> to view your URLs.");
   }
 });
+//   if (CheckUser(req.session.user_id)) {
+//
+//     res.render("urls_index", templateVars);
+//
 
 //displays 'Hello' on page /
 app.get("/", (req, res) => {
@@ -259,7 +302,11 @@ app.listen(PORT, () => {
 });
 
 //send the user to long form url when they have entered their token id after the /
-app.get("/u/:shortURL", (req, res) => {
-  let longURL = "http://" + urlDatabase[req.params.shortURL];
+app.get("/u/:id", (req, res) => {
+
+  // let longURL = urlDatabase[rString].longURL;
+  console.log("longURL:", urlDatabase[req.session.user_id].longURL);
+   let longURL = urlDatabase[rString].longURL
+   console.log("longURL String Function", urlDatabase[rString].longURL);
   res.redirect(longURL);
 });

@@ -5,21 +5,9 @@
 </head>
 <body>
 
-  <form method="POST" action="/urls/9sm5xK/delete">...</form>
+  <form method="POST" action="/urls/:id/delete">...</form>
   <header>
     <% include ./partials/_header %>
   </header>
   <h1> URLS </h1>
-
-  <% for(var list in urlList) { %>
-        <li>
-          <%= urlList[list] + ': ' + urlList[list].longURL %>
-          <a href="/urls/<%= url %>">Edit</a>
-          <form action ="/urls/<%= url %>/delete" method = "POST">
-            <input type ="Submit" value="DELETE">
-          </form>
-        </li>
-      <% } %>
-
-</body>
-</html>
+<!--  -->
