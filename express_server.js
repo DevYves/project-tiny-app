@@ -162,9 +162,10 @@ app.post("/urls/:id", (req, res) => {
 
 // Deletes a URL from database if it is the users link
 app.post("/urls/:id/delete", (req, res) => {
+
   console.log("url database: ", urlDatabase[req.params.id].userID);
   console.log("req.cookies: ", req.cookies.user_id);
-  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+  if ((urlDatabase[req.params.id].userID !== req.cookies.user_id) || (!req.cookies.user_id)) {
     res.status(403);
     res.send("Naughty Gnomes at it again! NO deleting other people's links please");
   } else {
@@ -194,7 +195,7 @@ app.get("/urls/new", (req, res) => {
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
   console.log(urlDatabase[req.params.id].userID )
-   if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+   if ((urlDatabase[req.params.id].userID !== req.cookies.user_id) || (!req.cookies.user_id)) {
     res.redirect("/urls");
   } else {
   let templateVars = { urls: urlDatabase, shortURL: req.params.id, userdata: users[req.cookies.user_id]};
@@ -231,4 +232,3 @@ app.get("/u/:shortURL", (req, res) => {
   console.log(longURL);
   res.redirect(longURL);
 });
-
