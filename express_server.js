@@ -24,9 +24,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 // OBJECT DATABASE SECTION
 // New Url database
 var urlDatabase = {
-  "b2xVn2": { userID: "UserRandomID", longURL: "http://www.lighthouselabs.ca"},
+  "b2xVn2": { userID: "UserRandomID", longURL: "http://www.lighthouselabs.ca", shortURL: "b2xVn2"},
 
-  "9sm5xK": { userID: "userRandomID2", longURL: "http://www.google.com" }
+  "9sm5xK": { userID: "userRandomID2", longURL: "http://www.google.com", shortURL: "9sm5xK" }
 
 }
 var saltRounds = 10;
@@ -239,7 +239,8 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log("urlDatabase before: ", urlDatabase);
   urlDatabase[rString] = { "userID": req.session.user_id,
-                          "longURL": req.body.longURL }
+                          "longURL": req.body.longURL
+                          "shortURL": rString; }
   console.log("urlDatabase after: ", urlDatabase)
   console.log("long url: ", urlDatabase[rString].longURL);
   res.redirect(`/urls/${rString}`);
@@ -272,13 +273,17 @@ app.get("/urls/:id", (req, res) => {
 
 //make logic sit here not on index page
 app.get("/urls", (req, res) => {
-  newDatabase = {};
-  if (checkUser(req.session.user_id)){
-    let templateVars = { shortURL: req.params.id, urls : urlDatabase, urlList: urlsForUser(req.session.user_id), userinfo: users[req.session.user_id] };
-    res.render("urls_index", templateVars);
-  } else {
+  if (!checkUser(req.session.user_id)){
     res.status(403);
     res.send("Sorry Bub. You need to <a href=\"/login\">login  </a> or <a href=\"/register\">register  </a> to view your URLs.");
+    return;
+  } else {
+  newDataBase = {};
+  let newDataBase = urlsForUser(req.session.user_id);
+  let templateVars = { urls :newDatabase shortURL: req.params.id, urls : urlDatabase, urlList: , userinfo: users[req.session.user_id] };
+    res.render("urls_index", templateVars);
+  } else {
+
   }
 });
 //   if (CheckUser(req.session.user_id)) {

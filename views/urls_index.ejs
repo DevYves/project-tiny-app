@@ -4,10 +4,23 @@
   <title>TinyApp</title>
 </head>
 <body>
-
-  <form method="POST" action="/urls/:id/delete">...</form>
   <header>
     <% include ./partials/_header %>
   </header>
   <h1> URLS </h1>
-<!--  -->
+
+  <% if (urlList == {}) { %>
+    Add a url
+  <% } else { %>
+
+    <% for(var list in urlList) { %>
+        <li> <%= "Short URL"  + list + ": Long URL" + list.longURL  %> </li>
+
+    <% } %>
+      <li> <a href ="#" target = "_blank"> new link for shortening URL </a></li>
+  <% } %>
+</body>
+
+
+
+
