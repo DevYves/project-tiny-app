@@ -74,15 +74,6 @@ function CompareIDtoEmail(email) {
   return "";
 }
 
-//   for (var test in users) {
-//     ("users email in function: ", users[test].email);
-//     if (users[test].email = email) {
-//       return test;
-//     }
-//   }
-//   console.log("found users id after for loop in function: ", users[test].email);
-
-// }
 // function used to check if an email has already been registered
 function checkRegisteredUserEmail(email) {
   let isEmail = false;
@@ -136,6 +127,18 @@ function checkUser(userID) {
 function PasswordCheck(userID, password){
   return bcrypt.compareSync(inputPassword, users[userID].password);
 }
+
+// Returns a boolean response based on whether a url exists in the database
+function verifyURL(userLink) {
+  let exists = false;
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].id === userLink) {
+      exists = true;
+    }
+  }
+  return exists;
+}
+
 
 //REGISTER GET & POST SECTION
 //renders register page on get request for this address
@@ -224,17 +227,19 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  if (!req.session.user_id) {
+  console.log(req.session.user_id);
+  if (!checkUser(req.session.user_id)) {
     res.status(401);
     res.send('<a href="/login">Login</a> to access');
   } else if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     res.status(403);
-    res.send(`Don't go chasing waterfalls...or modifying other peoples teeny URLS`);
+    res.send(`Don't go chasing waterfalls...or modifying other people's teeny URLS. Please log into use the site.`);
   } else {
   urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect(`/urls/${req.params.id}`);
+  res.redirect(/urls/);
   }
 
+// ${req.params.id}`
 });
 
 // Deletes a URL from database if it is the users link
@@ -282,14 +287,17 @@ app.get("/urls/new", (req, res) => {
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
-   if ((urlDatabase[req.params.id].userID !== req.session.user_id) || (!req.session.user_id)) {
-    res.redirect("/urls");
+  let TemplateVars = {url: newDatabase , userinfo: users[req.session.user_id] };
+  console.log("get request");
+  console.log(req.params.id)
+  if (!verifyURL(req.params.id)) {
+    res.status(404);
+    res.send("Error 404: Your micro URL is so tiny it doesn't exist");
   } else {
-  let templateVars = { url : urlDatabase, shortURL: req.params.id, userinfo : users[req.session.user_id] };;
-  res.render("urls_show", templateVars);
-}
-
+    res.render("urls_show", templateVars);
+  }
 });
+
 
 //main url list page - makes you login or register to view
 
@@ -301,7 +309,6 @@ app.get("/urls", (req, res) => {
     return;
   } else {
     console.log(req.session.user_id);
-    let newDatabase = {};
     newDatabase = usersPersonalURLs(req.session.user_id);
     console.log(newDatabase);
     let templateVars = {url: newDatabase , userinfo: users[req.session.user_id] };
