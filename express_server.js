@@ -287,7 +287,7 @@ app.get("/urls/new", (req, res) => {
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {shortURL: req.params.id, url: newDatabase , userinfo: users[req.session.user_id] };
+  let templateVars = {longURL: urlDatabase[req.params.id].longURL, shortURL: req.params.id, url: newDatabase , userinfo: users[req.session.user_id]};
   console.log("get request");
   console.log(req.params.id)
   if (!verifyURL(req.params.id)) {

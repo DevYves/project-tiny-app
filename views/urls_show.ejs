@@ -7,11 +7,12 @@
 </head>
 <body>
    <% include ./partials/_header %>
-  <h1> URL </h1>
-  <h1> ShortURL:
+  <h3> Long Url: <%=longURL %> </h3>
+  <h1> ShortURL: <%=shortURL %> <h1>
   <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px;">
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Update">
     </form>
 </body>
 </html>
+
