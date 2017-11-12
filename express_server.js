@@ -132,7 +132,7 @@ function PasswordCheck(userID, password){
 function verifyURL(userLink) {
   let exists = false;
   for (let url in urlDatabase) {
-    if (urlDatabase[url].id === userLink) {
+    if (url === userLink) {
       exists = true;
     }
   }
@@ -227,7 +227,6 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  console.log(req.session.user_id);
   if (!checkUser(req.session.user_id)) {
     res.status(401);
     res.send('<a href="/login">Login</a> to access');
@@ -235,11 +234,9 @@ app.post("/urls/:id", (req, res) => {
     res.status(403);
     res.send(`Don't go chasing waterfalls...or modifying other people's teeny URLS. Please log into use the site.`);
   } else {
-  urlDatabase[req.params.id] = req.body.longURL;
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect(/urls/);
   }
-
-// ${req.params.id}`
 });
 
 // Deletes a URL from database if it is the users link
@@ -270,8 +267,11 @@ app.post("/urls", (req, res) => {
                           shortURL: shortURL }
   console.log("urlDatabase after: ", urlDatabase)
   console.log("long url: ", urlDatabase[shortURL].longURL);
-  res.send("What a beauty! Your new short URL: is http//localhost:8080/u");
-    }
+  res.redirect("/urls");
+}
+  // ("What a beauty! Your new short URL: is http//localhost:8080/<a href="/shortURL>");
+
+  //   }
 });
 
 // on a get request at /urls/new - render urls_new.ejs file and displays it for user
@@ -287,7 +287,7 @@ app.get("/urls/new", (req, res) => {
 
 //displays the ejs file urls_show when the url entered is a key value in th urlDatabase
 app.get("/urls/:id", (req, res) => {
-  let TemplateVars = {url: newDatabase , userinfo: users[req.session.user_id] };
+  let templateVars = {shortURL: req.params.id, url: newDatabase , userinfo: users[req.session.user_id] };
   console.log("get request");
   console.log(req.params.id)
   if (!verifyURL(req.params.id)) {
