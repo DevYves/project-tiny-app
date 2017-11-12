@@ -5,16 +5,11 @@
 </head>
 <body>
 
-<% if ( userinfo.id === undefined){ %>
-<h2>You are not logged in. Please <a href="/login">login</a></h2> <h2>or<a href="/register">register</a></h2>
-
-<% } else { %>
-
   <header>
     <% include ./partials/_header %>
   </header>
 
-  <h4> <% "You are logged in as" + userinfo.email %> </h4>
+
 
   <h1> URLS </h1>
 
@@ -27,7 +22,7 @@
     </tr>
     <% } %>
 
-  <% } %>
+
 
 </body>
 

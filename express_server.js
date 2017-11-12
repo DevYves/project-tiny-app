@@ -180,6 +180,7 @@ app.post("/register", (req, res) => {
 
 //LOGOUT POST SECTION - recieves query for logout and deletes cookie
 app.post("/logout", (req, res)=>{
+  console.log("WTF")
   // req.session.user_id = null;
   // req.session("user_id", "", { expires: new Date(0)});
   req.session = null;
@@ -303,6 +304,7 @@ app.get("/urls/:id", (req, res) => {
 
 //make logic sit here not on index page
 app.get("/urls", (req, res) => {
+  console.log(req.session.user_id)
   if (!req.session.user_id){
     res.status(403);
     res.send("Sorry Bub. You need to <a href=\"/login\">login  </a> or <a href=\"/register\">register  </a> to view your URLs.");
@@ -322,7 +324,11 @@ app.get("/urls", (req, res) => {
 
 //displays 'Hello' on page /
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if (!checkUser(req.session.user_id)){
+    res.redirect("/login");
+    } else {
+    res.redirect("/urls");
+  }
 });
 
 // creates a simple hello html framework when the user navigates to /hello
