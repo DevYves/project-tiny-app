@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<% if (userinfo === undefined){ %>
+<% if ( userinfo.id === undefined){ %>
 <h2>You are not logged in. Please <a href="/login">login</a></h2> <h2>or<a href="/register">register</a></h2>
 
 <% } else { %>
@@ -19,17 +19,15 @@
   <h1> URLS </h1>
 
 
-    <% for (var list in url) { %>
-
-        <li> <%= "Short URL"  + url[list].shortURL + ": Long URL" + url[list].longURL  %> </li>
-          <form action ="/urls/<%= url %>/delete" method = "POST">
- +        <input type ="Submit" value="DELETE">
+    <% for (let list in url) { %>
+    <tr>
+        <td> <%= "Short URL"  + url[list].shortURL + ": Long URL" + url[list].longURL  %> </td>
+         <td><form method="GET" action="/urls/<%= list %>"><input type="submit" value="Edit"></form></td>
+         <td><form method="POST" action="/urls/<%= list %>/delete"><input type="submit" value="Delete"></form></td>
+    </tr>
     <% } %>
 
   <% } %>
 
 </body>
-
-
-
 
