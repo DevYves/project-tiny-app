@@ -29,5 +29,3 @@ The server features encrypted registration and cookies using Bcrypt and Cookie S
 links. There is a
 
 After registering an account, users can create short urls that will be associated with their account. These urls can be shared anywhere.
-
-Client-side session management (implemented using cookie-sessions) makes the application stateful without compromising security. Bcrypt is used for password encryption to ensure the protection of user information.
