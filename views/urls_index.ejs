@@ -7,12 +7,12 @@
   <header>
     <% include ./partials/_header %>
   </header>
-  <h1> URLS </h1>
+    <h1> URLS </h1>
     <% for (let list in url) { %>
     <tr>
-        <td> <%= "Short URL"  + url[list].shortURL + ": Long URL" + url[list].longURL  %> </td>
-         <td><form method="GET" action="/urls/<%= list %>"><input type="submit" value="Edit"></form></td>
-         <td><form method="POST" action="/urls/<%= list %>/delete"><input type="submit" value="Delete"></form></td>
+      <td> <%= "Short URL"  + url[list].shortURL + ": Long URL" + url[list].longURL  %> </td>
+      <td><form method="GET" action="/urls/<%= list %>"><input type="submit" value="Edit"></form></td>
+      <td><form method="POST" action="/urls/<%= list %>/delete"><input type="submit" value="Delete"></form></td>
     </tr>
     <% } %>
 </body>
