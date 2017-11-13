@@ -6,8 +6,8 @@ transform URLS into shorter more accesible URLS for use on venues where space is
 
 ## Final Product
 
-!["Screenshot of the urls page"](https://github.com/DevYves/tiny-app/docs/Tiny_App_URL_List.png)
-!["Screenshot of the Registraion page"](https://github.com/DevYves/tiny-ap/docs/Tiny_App_Registration.png)
+!["Screenshot of the urls page"](https://github.com/DevYves/project-tiny-app/blob/master/docs/TIny_App_URL_List.png)
+!["Screenshot of the Registraion page"](https://github.com/DevYves/project-tiny-app/blob/master/docs/Tiny_App_Registration.png)
 
 ## Dependencies
 - bcrypt
