@@ -29,9 +29,9 @@ var urlDatabase = {
     shortURL: "9sm5xK" }
 
 }
-var saltRounds = 10;
-//sets the number of rounds of hashing
-var salt = bcrypt.genSaltSync(saltRounds);
+// var saltRounds = 10;
+// //sets the number of rounds of hashing
+// var salt = bcrypt.genSaltSync(saltRounds);
 
 // database of users
 const users = {
@@ -52,7 +52,7 @@ const users = {
   }
 }
 
-// HELPER FUNCTION SECTION
+// -------------------  HELPER FUNCTION SECTION -------------------
 //variable to hold randomized string
 function generateRandomString(){
 let rString = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -86,18 +86,18 @@ function checkRegisteredUserEmail(email) {
 }
 
 // function used to check if a password matches a specific email
-function passwordCheck(email, password){
-  let isPassword = false;
-  for (var test in users) {
-    if (users[test].email === email){
-      if (users[test].password === password) {
+// function passwordCheck(email, password){
+//   let isPassword = false;
+//   for (var test in users) {
+//     if (users[test].email === email){
+//       if (users[test].password === password) {
 
-      isPassword = true;
-      }
-    return isPassword;
-    }
-  }
-}
+//       isPassword = true;
+//       }
+//     return isPassword;
+//     }
+//   }
+// }
 // function used to find the links for a given user
 function usersPersonalURLs(id){
   let userLinks = {};
@@ -124,8 +124,10 @@ function checkUser(userID) {
    return isAUser;
 }
 
-function PasswordCheck(userID, password){
-  return bcrypt.compareSync(inputPassword, users[userID].password);
+function passwordCheck(userID, password){
+  console.log(userID, password);
+  console.log(bcrypt.compareSync(password, users[userID].password));
+  return bcrypt.compareSync(password, users[userID].password);
 }
 
 // Returns a boolean response based on whether a url exists in the database
@@ -152,7 +154,7 @@ app.get("/register", (req, res) => {
 });
 // post reciever that registers a new user and initiates checks
 app.post("/register", (req, res) => {
-
+  console.log("req.body.password :", req.body.password);
   // Check that user inputed an email and password.
   if (!req.body.email | !req.body.password) {
     res.status(400);
@@ -169,7 +171,7 @@ app.post("/register", (req, res) => {
     users[newUsersId] = {
       id:       newUsersId,
       email:    req.body.email,
-      password: bcrypt.hashSync(req.body.password, salt),
+      password: bcrypt.hashSync(req.body.password, 10)
       };
       console.log("users after register: " , users);
       //adds new user to cookie
@@ -180,18 +182,24 @@ app.post("/register", (req, res) => {
 
 //LOGOUT POST SECTION - recieves query for logout and deletes cookie
 app.post("/logout", (req, res)=>{
-  console.log("WTF")
+  console.log("req.user.id before:", req.session.user_id);
+  console.log("req.user.email", req.session.user_email);
   // req.session.user_id = null;
   // req.session("user_id", "", { expires: new Date(0)});
-  req.session = null;
+  req.session.user_id = null;
+  console.log("on logout req email: ", req.session.email);
+  console.log("on logout req password: ", req.session.password);
   res.redirect("/urls");
 });
 
 // LOGIN POST AND GET SECTION
 // renders login page
 app.get("/login", (req, res) =>{
-  console.log("Req Session :", req.session.user_id);
-  if (req.session.user_id === undefined){
+  console.log("get login Req Session :", req.session.user_id);
+  console.log("req session email:", req.session.email);
+    console.log("req session password: ",req.session.password)
+    console.log(users);
+  if (!req.session.user_id){
     res.render("urls_login");
   } else {
     let templateVars = { url : urlDatabase , userinfo : users[req.session.user_id]};
@@ -200,7 +208,7 @@ app.get("/login", (req, res) =>{
 });
 // login checked and working
 app.post("/login", (req, res) => {
-
+  console.log(users);
   console.log(req.body.email);
   var userEmail = req.body.email;
   console.log("app.post login : req.body.Email: ", req.body.email);
@@ -215,7 +223,7 @@ app.post("/login", (req, res) => {
   } else if (!checkRegisteredUserEmail(userEmail)) {
     res.status(403);
     res.send("Error. That email is not registered.");
-  } else if (passwordCheck(userID, password)){
+  } else if (!passwordCheck(userID, password)){
     res.status(403);
     res.send("Uh oh The gnomes behind the scenes have checked our lists and your password does not match!");
   } else {
@@ -268,6 +276,7 @@ app.post("/urls", (req, res) => {
                           shortURL: shortURL }
   console.log("urlDatabase after: ", urlDatabase)
   console.log("long url: ", urlDatabase[shortURL].longURL);
+  console.log("app post urls session id :",  req.session.user_id);
   res.redirect("/urls");
 }
   // ("What a beauty! Your new short URL: is http//localhost:8080/<a href="/shortURL>");
@@ -317,10 +326,6 @@ app.get("/urls", (req, res) => {
     res.render("urls_index", templateVars);
   }
 });
-//   if (CheckUser(req.session.user_id)) {
-//
-//     res.render("urls_index", templateVars);
-//
 
 //displays 'Hello' on page /
 app.get("/", (req, res) => {
@@ -343,8 +348,8 @@ app.listen(PORT, () => {
 
 //send the user to long form url when they have entered their token id after the /
 app.get("/u/:id", (req, res) => {
-  // let longURL = urlDatabase[rString].longURL;
-  console.log("longURL:", urlDatabase[req.session.user_id].longURL);
-   let longURL = urlDatabase[req.params.id].longURL;
-  res.redirect(longURL);
+console.log("url Database :",urlDatabase);
+  console.log("req.params.id : ", req.params.id);
+var newplace = urlDatabase[req.params.id].longURL;
+  res.redirect(newplace);
 });

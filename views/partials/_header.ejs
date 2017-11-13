@@ -1,17 +1,14 @@
-
-<% if (userinfo === undefined) {%>
+<body style="background-color:#fcebbf">
+<% if (userinfo == undefined) {%>
 <div>
 <a href="/login"><button>Login</button></a> <a href="/register"><button>Register</button></a>
+</div>
 <% } else { %>
 <nav>
    <h1> Tiny App </h1>
-      <a href="/urls/"> Tiny URLS List</a>
-      <a href="/urls/new"> Make a new tiny URL</a>
+    <h3>  <a href="/urls/"> Tiny URLS List</a> </h3>
+    <h3>  <a href="/urls/new"> Make a new tiny URL</a> </h3>
 </nav>
-
-
-</h3>
-<div>
   </form>
     <label for="login">Logged in as: <%= userinfo.email %></label>
   </form>
@@ -19,5 +16,5 @@
     <input type="submit" value="Logout">
 </form>
 </div>
-<% }%>
-
+<% } %>
+</body>

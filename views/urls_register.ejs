@@ -1,8 +1,20 @@
-<a href="/login"><button>Login</button></a> <a href="/register"><button>Register</button></a>
-
-      <form action="/register" method="POST" style="margin:150px;">
-      <label for="email">Enter an Email:</label>
-      <input id="email" type="text" name="email" style="width: 300px">
-      <label for="password"> Enter a password: </label>
-      <input id="password" type="text" name="password" style="width:300px">
-      <input type="submit" value="Enter">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Tiny App Registration</title>
+</head>
+<body style="background-color:#fcebbf">
+  <h1> Registration </h1>
+  <h4> Release the little ones. </h4>
+  <form method="POST" action="/register"  style="font-family:sans-serif;">
+    <label for="register">Email:</label>
+    <input id="register" type="email" name="email" placeholder="user@email.com">
+    <br><br>
+    <label for="register">Password:</label>
+    <input id="register" type="password" name="password" placeholder="********">
+    <br><br>
+    <input type="submit" value="Submit">
+  </form>
+  <h3>If you already have an account. <a href="/login">Login</a> to your account.</h3>
+</body>
+</html>
